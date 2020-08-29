@@ -182,7 +182,7 @@ class ETFMNode {
     }
 }
 
-class ExpanToFromMid {
+class ExpandToFromMid {
 
     curr : ETFMNode = new ETFMNode(0)
     dir : number = 1
@@ -202,5 +202,27 @@ class ExpanToFromMid {
 
     startUpdating(cb : Function) {
         this.curr.startUpdating(cb)
+    }
+}
+
+class Renderer {
+
+    etfm : ExpandToFromMid = new ExpandToFromMid()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.etfm.draw(context)    
+    }
+
+    handleTap(cb : Function) {
+        this.etfm.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.etfm.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
     }
 }
