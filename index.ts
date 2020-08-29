@@ -1,9 +1,9 @@
 const w : number = window.innerWidth 
 const h : number = window.innerHeight 
 const lines : number = 5 
-const scGap : number = 0.02 / ((lines + 1) / 2) 
+const scGap : number = 0.02 / (lines + 1) 
 const strokeFactor : number = 90
-const sizeFactor : number = 11.2 
+const sizeFactor : number = 4.3
 const delay : number = 20 
 const colors : Array<string> = ["#3F51B5", "#F44336", "#009688", "#2196F3", "#FF5722"]
 const backColor : string = "#BDBDBD"
@@ -15,7 +15,7 @@ class ScaleUtil {
     }
 
     static divideScale(scale : number, i : number, n : number) : number {
-        return Math.min(1 / n, ScaleUtil.divideScale(scale, i, n)) * n 
+        return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n 
     }
 
     static sinify(scale : number) : number {
@@ -40,19 +40,19 @@ class DrawingUtil {
 
     static drawExpandToFromMid(context : CanvasRenderingContext2D, scale : number) {
         const sf : number = ScaleUtil.sinify(scale)
-        const gap : number = w / (lines + 2)
+        const gap : number = w / (lines)
         const r : number = gap / sizeFactor 
         const hSize : number = h / hSizeFactor 
         for (var j = 0; j < lines; j++) {
-            const i : number = Math.abs(j - (lines / 2))
+            const i : number = Math.abs(j + 1 - ((lines + 1) / 2))
             const sfi : number = ScaleUtil.divideScale(sf, i, (lines + 1) / 2)
             const sfi1 : number = ScaleUtil.divideScale(sfi, 0, 2)
             const sfi2 : number = ScaleUtil.divideScale(sfi, 1, 2)
-            const hGap : number = hSize * ((lines / 2) - i) * sfi1
+            const hGap : number = hSize * (lines - i) * sfi1
             context.save()
-            context.translate(gap * i + gap / 2, h)
+            context.translate(gap * j + gap / 2, h)
             DrawingUtil.drawLine(context, 0, -hGap, 0, 0)
-            DrawingUtil.drawCircle(context, 0, 0, r * sfi2)
+            DrawingUtil.drawCircle(context, 0, -hGap, r * sfi2)
             context.restore()
         }
     }
@@ -61,7 +61,7 @@ class DrawingUtil {
         context.lineCap = 'round'
         context.lineWidth = Math.min(w, h) / strokeFactor 
         context.strokeStyle = colors[i]
-        context.fillStyle = backColor 
+        context.fillStyle = colors[i] 
         DrawingUtil.drawExpandToFromMid(context, scale)
     }
 }
